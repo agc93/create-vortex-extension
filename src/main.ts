@@ -10,9 +10,7 @@ import gitignore from 'gitignore';
 import hbs from "handlebars";
 const license = require('spdx-license-list/licenses/MIT')
 
-
-
-import { CreationOptions } from "./cli";
+import { CreationOptions, Templates } from "./cli";
 
 const access = promisify(fs.access);
 const copy = promisify(ncp);
@@ -33,23 +31,27 @@ async function copyTemplateFiles(options: TemplateOptions) {
     });
 }
 
-async function templateFiles(options: TemplateOptions) {
-    var isTemplate = /^[^.]+$|\.(?=(hbs)$)([^.]+$)/gm;
-    var tmplPath = options.templateDirectory;
-    // const dir = await fs.promises.opendir(tmplPath)
+async function renderTemplates(options: TemplateOptions, relativeSourcePath: string = '.') {
+    var tmplPath = path.join(options.templateDirectory, relativeSourcePath)
     const dir = await fs.promises.readdir(tmplPath);
 
-    // Loop them all with the new for...of
     for (const file of dir) {
         var fileName = path.basename(file);
-    // for await (const dirent of dir) {
         if (path.extname(fileName) == '.hbs') {
             var templateFile = await readFile(path.join(tmplPath, fileName), { encoding: 'utf8' });
             var template = hbs.compile(templateFile);
             var output = template({ packageId: options.id, author: options.userName || options.name });
-            await writeFile(path.join(options.targetDirectory, fileName.replace(path.extname(fileName), '')), output, { encoding: 'utf8' });
+            await writeFile(path.join(options.targetDirectory, relativeSourcePath, fileName.replace(path.extname(fileName), '')), output, { encoding: 'utf8' });
         }
     }
+}
+
+async function templateFiles(options: TemplateOptions) {
+    await renderTemplates(options);
+}
+
+async function templateActionsFiles(options: TemplateOptions) {
+    await renderTemplates(options, '.github');
 }
 
 async function createGitignore(options: TemplateOptions) {
@@ -126,6 +128,11 @@ export async function createProject(args: CreationOptions) {
             enabled: () => options.git,
         },
         {
+            title: 'Create Actions workflow',
+            task: () => templateActionsFiles(options),
+            enabled: () => options.actions
+        },
+        {
             title: 'Install dependencies',
             task: () =>
                 projectInstall({
@@ -143,5 +150,11 @@ export async function createProject(args: CreationOptions) {
     await tasks.run();
 
     console.log('%s Project ready', chalk.green.bold('DONE'));
+    var tmpl = Templates[options.template];
+    var packageFile = tmpl?.metaFile ?? 'info.json';
+    console.log('Make sure you check your %s before you get started.', chalk.yellow.bold(packageFile));
+    if (tmpl?.message) {
+        console.log('%s', chalk.blueBright(tmpl.message));
+    }
     return true;
 }

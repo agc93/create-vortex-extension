@@ -8,6 +8,7 @@ export type CreationArgs = {
     template: string;
     runInstall: boolean;
     license: boolean;
+    actions: boolean;
 }
 
 export type CreationOptions = CreationArgs & {
@@ -17,6 +18,11 @@ export type CreationOptions = CreationArgs & {
     id?: string;
 }
 
+export const Templates: {[key: string]: {metaFile: string, message?: string}} = {
+    ["TypeScript"]: {metaFile: "package.json"},
+    ["JavaScript"]: {metaFile: "info.json", message: "You will need to set your extension's metadata yourself!"}
+}
+
 function parseArgumentsIntoOptions(rawArgs: string[]) : CreationArgs {
     const args = arg(
         {
@@ -24,6 +30,7 @@ function parseArgumentsIntoOptions(rawArgs: string[]) : CreationArgs {
             '--yes': Boolean,
             '--install': Boolean,
             '--license': Boolean,
+            '--actions': Boolean,
             '-g': '--git',
             '-y': '--yes',
             '-i': '--install',
@@ -38,12 +45,13 @@ function parseArgumentsIntoOptions(rawArgs: string[]) : CreationArgs {
         git: args['--git'] || false,
         template: args._[0],
         runInstall: args['--install'] || false,
-        license: args['--license'] || false
+        license: args['--license'] || false,
+        actions: args['--actions'] || false
     };
 }
 
 async function promptForMissingOptions(options: CreationArgs): Promise<CreationOptions> {
-    const defaultTemplate = 'TypeScript';
+    const defaultTemplate = Object.keys(Templates)[0];
     if (options.skipPrompts) {
         return {
             ...options,
@@ -57,7 +65,7 @@ async function promptForMissingOptions(options: CreationArgs): Promise<CreationO
             type: 'list',
             name: 'template',
             message: 'Please choose which project template to use',
-            choices: ['TypeScript', 'JavaScript'],
+            choices: Object.keys(Templates),
             default: defaultTemplate,
         } as ListQuestion);
     }

@@ -2,8 +2,8 @@
   "name": "create-vortex-extension",
   "version": "0.0.1",
   "description": "Scaffolding for creating Vortex extensions",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cli.js",
+  "types": "./dist/cli.d.ts",
   "bin": {
     "@agc93/create-vortex-extension": "bin/create-vortex-extension",
     "create-vortex-extension": "bin/create-vortex-extension"
