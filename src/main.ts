@@ -7,19 +7,19 @@ import execa from 'execa';
 import Listr from 'listr';
 import { projectInstall } from 'pkg-install';
 import gitignore from 'gitignore';
-import hbs from "handlebars";
+
 const license = require('spdx-license-list/licenses/MIT')
 
 import { CreationOptions, Templates } from "./cli";
+import { renderTemplates } from './templating';
 
 const access = promisify(fs.access);
 const copy = promisify(ncp);
 const writeFile = promisify(fs.writeFile);
-const readFile = promisify(fs.readFile);
 const writeGitignore = promisify(gitignore.writeFile);
 
 
-type TemplateOptions = CreationOptions & {
+export type TemplateOptions = CreationOptions & {
     targetDirectory: string;
     templateDirectory: string;
 }
@@ -31,27 +31,14 @@ async function copyTemplateFiles(options: TemplateOptions) {
     });
 }
 
-async function renderTemplates(options: TemplateOptions, relativeSourcePath: string = '.') {
-    var tmplPath = path.join(options.templateDirectory, relativeSourcePath)
-    const dir = await fs.promises.readdir(tmplPath);
 
-    for (const file of dir) {
-        var fileName = path.basename(file);
-        if (path.extname(fileName) == '.hbs') {
-            var templateFile = await readFile(path.join(tmplPath, fileName), { encoding: 'utf8' });
-            var template = hbs.compile(templateFile);
-            var output = template({ packageId: options.id, author: options.userName || options.name });
-            await writeFile(path.join(options.targetDirectory, relativeSourcePath, fileName.replace(path.extname(fileName), '')), output, { encoding: 'utf8' });
-        }
-    }
-}
 
 async function templateFiles(options: TemplateOptions) {
     await renderTemplates(options);
 }
 
 async function templateActionsFiles(options: TemplateOptions) {
-    await renderTemplates(options, '.github');
+    await renderTemplates(options, '.github', '.github/workflows');
 }
 
 async function createGitignore(options: TemplateOptions) {

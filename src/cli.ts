@@ -1,5 +1,5 @@
 import arg from 'arg';
-import inquirer, { Question, Answers, ListQuestion, InputQuestion } from 'inquirer';
+import inquirer, { Question, ListQuestion, InputQuestion } from 'inquirer';
 import { createProject } from './main';
 
 export type CreationArgs = {
@@ -27,12 +27,12 @@ function parseArgumentsIntoOptions(rawArgs: string[]) : CreationArgs {
     const args = arg(
         {
             '--git': Boolean,
-            '--yes': Boolean,
+            '--defaults': Boolean,
             '--install': Boolean,
             '--license': Boolean,
             '--actions': Boolean,
             '-g': '--git',
-            '-y': '--yes',
+            '-d': '--defaults',
             '-i': '--install',
             '-l': '--license'
         },
@@ -41,7 +41,7 @@ function parseArgumentsIntoOptions(rawArgs: string[]) : CreationArgs {
         }
     );
     return {
-        skipPrompts: args['--yes'] || false,
+        skipPrompts: args['--defaults'] || false,
         git: args['--git'] || false,
         template: args._[0],
         runInstall: args['--install'] || false,
