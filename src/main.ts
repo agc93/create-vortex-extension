@@ -72,7 +72,6 @@ async function initGit(options: TemplateOptions) {
 
 export async function createProject(args: CreationOptions) {
     const currentFileUrl = import.meta.url;
-    console.log(`url: ${new URL(currentFileUrl).pathname} / ${args.template}`);
     const templateDir = path.resolve(
         decodeURI(new URL(currentFileUrl).pathname),
         '../../templates',

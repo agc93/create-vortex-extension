@@ -115,9 +115,9 @@ async function promptForUserDetails(options: CreationArgs): Promise<CreationOpti
     questions.push({
         type: 'input',
         name: 'extId',
-        message: 'Enter an ID for your extension',
+        message: 'Enter an ID for your extension: ',
         validate: async (input) => {
-            return /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(input)
+            return /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(input) || 'Must be a valid package ID!'
         }
     });
     const answers = await inquirer.prompt(questions);
