@@ -1,6 +1,6 @@
 {
   "name": "create-vortex-extension",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Scaffolding for creating Vortex extensions",
   "main": "./dist/cli.js",
   "types": "./dist/cli.d.ts",
