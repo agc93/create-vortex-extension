@@ -1,6 +1,7 @@
 import arg from 'arg';
 import inquirer, { Question, ListQuestion, InputQuestion } from 'inquirer';
 import { createProject } from './main';
+import username from "git-user-name";
 
 export type CreationArgs = {
     skipPrompts: boolean;
@@ -105,7 +106,8 @@ async function promptForUserDetails(options: CreationArgs): Promise<CreationOpti
             validate: async (input) => {
                 return input ? true : false;
             },
-            name: 'name'
+            name: 'name',
+            default: username()
         } as InputQuestion);
     questions.push({
         type: 'input',

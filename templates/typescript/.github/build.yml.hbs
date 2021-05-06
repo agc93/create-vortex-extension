@@ -2,14 +2,14 @@ name: Extension CI Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths-ignore:
       - "docs/**"
       - ".github/workflows/docs.yml"
     tags:
       - 'v*.*.*'
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
